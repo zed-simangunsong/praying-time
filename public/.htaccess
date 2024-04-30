@@ -1,0 +1,21 @@
+<IfModule mod_rewrite.c | rewrite_module>
+RewriteEngine On
+
+# Redirect Trailing Slashes If Not A Folder...
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} (.+)/$
+RewriteRule ^ %1 [L,R=301]
+
+# Request isn't for a legitimate existing resource
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+
+# Redirect .html page to index.php with(out) uri segment & keep the query
+RewriteRule (.*)\.html(/.+)?$ index.php?playground_controller=$1&playground_segment=$2 [L,QSA]
+
+# Redirect all other requests to the error page
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule . /index.php?playground_controller=error [L]
+</IfModule>

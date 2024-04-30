@@ -1,0 +1,9 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    {% if activeZone is not empty %}
+        Your zone: {{ activeZone }}
+    {% else %}
+        Zone not available.
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,34 @@
+body {
+    font-size: 15px;
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+}
+
+#root div#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    line-height: 30px;
+    padding: 5px;
+    background-color: #cecece;
+}
+
+#root div#body {
+    margin-top: 50px;
+}
+
+.container {
+    display: flex;
+}
+
+.container.row {
+    flex-direction: row;
+}
+
+select {
+    padding: 5px;
+}
