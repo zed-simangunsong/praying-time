@@ -17,6 +17,15 @@ class IndexController
     /**
      * @param null $activeZone
      * @return string
+     * @throws \Pecee\Pixie\Exception
+     * @throws \Pecee\Pixie\Exceptions\ColumnNotFoundException
+     * @throws \Pecee\Pixie\Exceptions\ConnectionException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateColumnException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateEntryException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateKeyException
+     * @throws \Pecee\Pixie\Exceptions\ForeignKeyException
+     * @throws \Pecee\Pixie\Exceptions\NotNullException
+     * @throws \Pecee\Pixie\Exceptions\TableNotFoundException
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
@@ -30,7 +39,7 @@ class IndexController
         return view('index.twig', [
             'zones' => $zones,
             'activeZone' => $activeZone,
-            'boxes' => $activeZone ? ZoneModel::getBoxByZone($activeZone) : [],
+            'boxes' => $activeZone ? BoxModel::instance()->getByZonePrayerTimeOption($activeZone) : [],
         ]);
     }
 }

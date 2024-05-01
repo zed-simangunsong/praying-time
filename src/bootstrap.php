@@ -5,6 +5,17 @@
  * @license     MIT License
  * @copyright   Copyright (2) 2024, zed-simangunsong
  */
+/*
+|--------------------------------------------------------------------------
+| Start session.
+|--------------------------------------------------------------------------
+|
+*/
+session_start();
+
+if (!isset($_SESSION['token']) || empty($_SESSION['token'])) {
+    $_SESSION['token'] = bin2hex(random_bytes(32));
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -76,4 +87,3 @@ $env->load();
 |
 */
 define('BASE_URL', env('BASE_URL', '/'));
-

@@ -9,7 +9,7 @@
 <body>
 <div id="root">
     <div id="header">
-        <div class="container row">
+        <div class="flex row">
             <div>
                 Select Zone
             </div>
@@ -17,10 +17,11 @@
             <div style="margin-left: 15px;">
                 <select>
                     {% if zones %}
-                        {% for zone in zones %}
-                            <option value="{{ zone }}">{{ zone }}<option>
+                    {% for zone in zones %}
+                    <option value="{{ zone }}">{{ zone }}
+                    <option>
                         {% endfor %}
-                    {% endif %}
+                        {% endif %}
                 </select>
             </div>
         </div>
@@ -31,5 +32,8 @@
         {% endblock %}
     </div>
 </div>
+
+{% block script %}
+{% endblock %}
 </body>
 </html>

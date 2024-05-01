@@ -12,43 +12,43 @@ use Zed\Test\App\Models\BoxModel;
 use Zed\Test\App\Models\BoxSongModel;
 use Zed\Test\App\Models\CronModel;
 use Zed\Test\App\Models\ZoneModel;
-use Zed\Test\Lib\Request;
+use Zed\Test\Lib\Api;
 
+// Start date of praying time batch.
 $today = date('Y-m-d');
 
-$cron = CronModel::instance();
+$boxModel = BoxModel::instance();
+$cronModel = CronModel::instance();
+$boxSongModel = BoxSongModel::instance();
 
-$start = time();
-$endDate = date('Y-m-d', strtotime('+7 day'));
 
 foreach (ZoneModel::getCodes() as $zone) {
     echo $zone . '<br/>';
 
-    // Get boxes by zone.
-    $boxes = BoxModel::instance()->getBoxByZone($zone, 'id', 'box_name');
+    // Get boxes which have prayer time option on within zone.
+    $boxes = $boxModel->getByZonePrayerTimeOption($zone, 1, 'id', 'box_name');
 
     foreach ($boxes as $box) {
-        echo $zone . ' ' . $box->box_name . '<br/>';
-
-        $task = $cron->haveCronTask($today, 1, $zone);
+        // Check if current date already have executed cron task.
+        $task = $cronModel->haveCronTask($today, $box->id, $zone);
 
         if (!$task) {
-            $request = new Request(env('API_URL') . env('API_ZONE_KEY') . '=' . $zone);
-            $result = $request->get();
+            // Call the API and get prayer times.
+            $request = (new Api($zone))->getPrayerTimes();
 
-            if ('ok' === $result->status && isset($result->data->prayerTime)) {
-                BoxSongModel::instance()->builder()->transaction(function (Transaction $transaction)
-                use ($result, $box) {
-                    dd($result->data->prayerTime);
-                });
+            if ('OK!' === $request->status && isset($request->prayerTime)) {
+                if ([] !== $boxSongModel->insertBatchApi($today, $request->prayerTime, $box->id, $zone, $endDate)) {
+                    // Batch inserted, now log to the cron table.
+                    $cronModel->builder()->insert([
+                        'start_date' => $today,
+                        'end_date' => $endDate,
+                        'box_id' => $box->id,
+                        'prayer_zone' => $zone,
+                    ]);
+                }
             } else {
-                // Send email.
+                // Send email regarding the error.
             }
         }
     }
 }
-
-echo '<pre>' . print_r([
-        'start' => date('Y-m-d H:i:s', $start),
-        'finish' => date('Y-m-d H:i:s', time()),
-    ], true) . '</pre>';

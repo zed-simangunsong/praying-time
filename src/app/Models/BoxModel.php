@@ -14,8 +14,8 @@ class BoxModel extends BaseModel
     protected $table = 'box';
 
     /**
-     * @param $zone
-     * @param $columns
+     * @param $whereZone
+     * @param $selectColumns
      * @return array
      * @throws \Pecee\Pixie\Exception
      * @throws \Pecee\Pixie\Exceptions\ColumnNotFoundException
@@ -27,11 +27,35 @@ class BoxModel extends BaseModel
      * @throws \Pecee\Pixie\Exceptions\NotNullException
      * @throws \Pecee\Pixie\Exceptions\TableNotFoundException
      */
-    public function getBoxByZone($zone, ...$columns)
+    public function getByZone($whereZone, ...$selectColumns)
     {
         return $this
-            ->select(...$columns)
-            ->where('prayer_zone', $zone)
+            ->select(...$selectColumns)
+            ->where('prayer_zone', $whereZone)
+            ->get();
+    }
+
+    /**
+     * @param $whereZone
+     * @param int $wherePrayerTimeOption
+     * @param mixed ...$selectColumns
+     * @return array
+     * @throws \Pecee\Pixie\Exception
+     * @throws \Pecee\Pixie\Exceptions\ColumnNotFoundException
+     * @throws \Pecee\Pixie\Exceptions\ConnectionException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateColumnException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateEntryException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateKeyException
+     * @throws \Pecee\Pixie\Exceptions\ForeignKeyException
+     * @throws \Pecee\Pixie\Exceptions\NotNullException
+     * @throws \Pecee\Pixie\Exceptions\TableNotFoundException
+     */
+    public function getByZonePrayerTimeOption($whereZone, $wherePrayerTimeOption = 1, ...$selectColumns)
+    {
+        return $this
+            ->select(...$selectColumns)
+            ->where('prayer_zone', $whereZone)
+            ->where('prayer_time_option', $wherePrayerTimeOption)
             ->get();
     }
 }

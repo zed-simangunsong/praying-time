@@ -1,0 +1,85 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    <div class="flex row prayer_info">
+        {% for song in songs %}
+            <div class="flex-item card {{ 'audio-box-' ~ song.box_song_id }}">
+                <div>
+                    <div class="card-title">
+                        {{ song.prayer_name }}
+                    </div>
+                    <div class="card-body">
+                        {{ song.prayer_time }}
+
+                        <audio muted autoplay="true" id="{{ 'audio-box-' ~ song.box_song_id }}">
+                            <source src="{{ song.audio_file_path }}" type="audio/mp3">
+                            Your browser does not support the audio element.
+                        </audio>
+
+                        <button class="hidden button-audio-{{ song.box_song_id }}"
+                                onclick="playAudio()"
+                                data-target-audio="{{ 'audio-box-' ~ song.box_song_id }}"
+                                data-prayer-datetime="{{ song.prayer_date ~ ' ' ~song.prayer_time }}">X</button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+      let now = null, audioButtons = null, prayerTime = null, targetAudio = null;
+
+      function playAudio() {
+        // targetAudio = audio.getAttribute('data-target-audio');
+        targetAudio = 'audio-box-51';
+        targetAudio = document.getElementById(targetAudio);
+
+        targetAudio.muted = false;
+        targetAudio.play();
+      }
+
+      setTimeout(function(){
+        let btn = document.getElementsByClassName('button-audio-51');
+        console.log(btn[0]);
+        btn[0].click();
+      }, 3000);
+
+      // setInterval(function () {
+      //   // Today date.
+      //   now = new Date;
+      //   now = now.getFullYear()
+      //     + '-' + ('0' + (now.getMonth() + 1)).slice(-2)
+      //     + '-' + ('0' + now.getDate()).slice(-2)
+      //     + ' ' + ('0' + now.getHours()).slice(-2)
+      //     + ':' + ('0' + now.getMinutes()).slice(-2)
+      //     + ':' + ('0' + now.getSeconds()).slice(-2);
+      //
+      //   audioButtons = document.getElementsByClassName('button-audio');
+      //
+      //   for (let i = 0; i < audioButtons.length; i++) {
+      //     prayerTime = audioButtons[i].getAttribute('data-prayer-datetime');
+      //
+      //     if (5 === i) {
+      //       audioButtons[i].click();
+      //       break;
+      //     }
+      //
+      //     // if (prayerTime === now) {
+      //     //   targetAudio = audioButtons[i].getAttribute('data-target-audio');
+      //     //   targetAudio = document.getElementById(targetAudio);
+      //     //
+      //     //   if (audioButtons[i]) {
+      //     //     audioButtons[i].addEventListener('click', function () {
+      //     //       playAudio(targetAudio);
+      //     //       console.log('CLicked');
+      //     //     });
+      //     //
+      //     //     audioButtons[i].click();
+      //     //   }
+      //     // }
+      //   }
+      // }, 1000);
+    </script>
+{% endblock %}

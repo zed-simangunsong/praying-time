@@ -33,7 +33,8 @@ class View
         if (!self::$instance) {
             $loader = new FilesystemLoader(VIEW_PATH);
 
-            self::$instance = new static(new Environment($loader, 'true' !== env('CACHE_VIEW') ? [] : ['cache' => CACHE_VIEW]));
+            self::$instance = new static(new Environment($loader,
+                'true' !== env('CACHE_VIEW') ? [] : ['cache' => CACHE_VIEW]));
         }
 
         return self::$instance;

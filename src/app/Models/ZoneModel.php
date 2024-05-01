@@ -37,9 +37,4 @@ class ZoneModel
     {
         return self::$codes;
     }
-
-    public static function getBoxByZone($zone)
-    {
-        return (new BoxModel)->getBoxByZone($zone);
-    }
 }

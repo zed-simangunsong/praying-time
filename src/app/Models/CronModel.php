@@ -39,9 +39,4 @@ class CronModel extends BaseModel
             ->where('prayer_zone', '>=', $zone)
             ->first();
     }
-
-    public function generateSong($startDate, $endDate)
-    {
-
-    }
 }

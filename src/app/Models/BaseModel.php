@@ -21,9 +21,9 @@ abstract class BaseModel
 
     protected $connection;
 
-    public function __construct(Connection $connection = null)
+    public function __construct(Connection $connection)
     {
-        $this->connection = $connection ?? DB::getOrCreateDefaultConnection();
+        $this->connection = $connection;
     }
 
     /**
@@ -32,7 +32,7 @@ abstract class BaseModel
      */
     public static function instance(Connection $connection = null)
     {
-        return new static($connection);
+        return new static($connection ?? DB::getOrCreateDefaultConnection());
     }
 
     /**
@@ -57,5 +57,23 @@ abstract class BaseModel
     public function builder()
     {
         return $this->connection->getQueryBuilder()->table($this->table);
+    }
+
+    /**
+     * Reindex an array keyed by existing field.
+     *
+     * @param $rows
+     * @param $keyField
+     * @return array
+     */
+    public function keyBy($rows, $keyField)
+    {
+        $arr = [];
+
+        foreach ($rows as $row) {
+            $arr[$row->{$keyField}] = $row;
+        }
+
+        return $arr;
     }
 }

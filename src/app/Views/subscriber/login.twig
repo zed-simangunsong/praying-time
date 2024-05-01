@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Subscriber login</title>
+
+    <link href="{{ constant('BASE_URL') ~ '/styles/login.css' }}" rel="stylesheet">
+</head>
+<body>
+<div id="root">
+    <div id="body">
+        <div class="login-box">
+            <form action="{{ constant('BASE_URL') ~ '/subscriber.html/login' }}" method="POST">
+                <div class="container row">
+                    <input placeholder="Subscriber name" type="text" name="subscriberName" value="{{ subscriber }}"/>
+                </div>
+
+                <div class="container row">
+                    <input placeholder="password" type="password" name="password"/>
+                </div>
+
+                <div class="container row">
+                    <input type="hidden" value="{{ token }}" name="token"/>
+                    <button class="btn-login">Login</button>
+                </div>
+            </form>
+
+            <div>{{ error }}</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
