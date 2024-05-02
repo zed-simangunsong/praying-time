@@ -11,12 +11,12 @@ namespace Zed\Test\App\Controllers;
 
 use Zed\Test\App\Models\BoxSongModel;
 use Zed\Test\App\Models\SubscriberModel;
-use Zed\Test\Lib\Subscriber;
+use Zed\Test\Lib\User;
 
 class SubscriberController
 {
     /**
-     * @var Subscriber
+     * @var User
      */
     protected $subscriber;
 
@@ -32,7 +32,7 @@ class SubscriberController
 
     public function __construct()
     {
-        $this->subscriber = new Subscriber($_SESSION['subscriber'] ?? null);
+        $this->subscriber = new User($_SESSION['subscriber'] ?? null);
 
         $this->subscriberModel = SubscriberModel::instance();
 
@@ -61,16 +61,7 @@ class SubscriberController
             // Show login form.
             return $this->loginAction();
         } else {
-            // Get subscriber boxes.
-            $zones = [];
-            $boxes = $this->subscriberModel->box($this->subscriber->id());
-            $boxes = $this->subscriberModel->keyBy($boxes, 'prayer_zone');
-
-            foreach ($boxes as $box) {
-                if (!isset($activeZone)) $activeZone = $box->prayer_zone;
-
-                $zones[] = $box->prayer_zone;
-            }
+            [$zones, $boxes] = $this->getSubscriberZones($activeZone);
 
             if ([] !== $zones || !isset($boxes[$activeZone])) {
                 // Get box song.
@@ -79,6 +70,11 @@ class SubscriberController
                 return view('subscriber/index.twig', [
                     'zones' => $zones,
                     'songs' => $songs,
+                    'last_refresh' => $_SESSION['last_refresh'],
+                    'autoPlay' => env('AUTO_PLAY', 'true'),
+                    'hideButtonTimer' => env('HIDE_BUTTON_AFTER', 120000),
+                    'basePage' => BASE_URL . '/subscriber.html/index',
+                    'activeZone' => $activeZone,
                 ]);
             } else {
                 // Show subscribe notification page.
@@ -151,5 +147,25 @@ class SubscriberController
     {
         header('Location: ' . BASE_URL . '/subscriber.html');
         exit;
+    }
+
+    /**
+     * @param $activeZone
+     * @return array
+     */
+    protected function getSubscriberZones(&$activeZone)
+    {
+        // Get subscriber boxes.
+        $zones = [];
+        $boxes = $this->subscriberModel->box($this->subscriber->id());
+        $boxes = $this->subscriberModel->keyBy($boxes, 'prayer_zone');
+
+        foreach ($boxes as $box) {
+            if (!isset($activeZone)) $activeZone = $box->prayer_zone;
+
+            $zones[] = $box->prayer_zone;
+        }
+
+        return [$zones, $boxes];
     }
 }

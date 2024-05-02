@@ -13,9 +13,24 @@
 */
 session_start();
 
+/*
+|--------------------------------------------------------------------------
+| Form token. Required when post request been made.
+|--------------------------------------------------------------------------
+|
+*/
 if (!isset($_SESSION['token']) || empty($_SESSION['token'])) {
     $_SESSION['token'] = bin2hex(random_bytes(32));
 }
+
+/*
+|--------------------------------------------------------------------------
+| Last refresh date. Used to refresh the browser in
+| daily basis, in case it did not need to refresh,
+| manually such in display case.
+|--------------------------------------------------------------------------
+*/
+$_SESSION['last_refresh'] = date('Y-m-d');
 
 /*
 |--------------------------------------------------------------------------

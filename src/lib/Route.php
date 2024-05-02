@@ -32,11 +32,11 @@ class Route
         $queries = array_map('str_escape', $_GET);
 
         // Set controller.
-        $this->controller = env('BASE_CONTROLLER', 'Zed\Test\App\Controllers\IndexController');
+        $this->controller = env('BASE_CONTROLLER', 'Zed\Test\App\Controllers\AdminController');
 
         if (isset($queries['playground_controller'])) {
             $this->controller = 'Zed\Test\App\Controllers\\'
-                . Str::camelize($queries['playground_controller'], '.')
+                . ucfirst(Str::camelCase($queries['playground_controller'], ['-', '_', '.']))
                 . 'Controller';
         }
 
@@ -45,7 +45,7 @@ class Route
         if (isset($queries['playground_segment']) && !empty($queries['playground_segment'])) {
             $this->segment = explode('/', trim($queries['playground_segment'], '/'));
 
-            $this->action = Str::camelcase(array_shift($this->segment)) . 'Action';
+            $this->action = Str::camelCase(array_shift($this->segment)) . 'Action';
         }
     }
 
@@ -57,6 +57,7 @@ class Route
     public function response()
     {
         if (!class_exists($this->controller)) {
+            dd($this->controller);
             return $this->error('Page not found.', 404);
         } else {
             return (new $this->controller)->{$this->action}(...$this->segment);

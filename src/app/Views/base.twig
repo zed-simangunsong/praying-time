@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title></title>
 
-    <link href="{{ constant('BASE_URL') ~ '/styles/app.css' }}" rel="stylesheet">
+    <link href="{{ constant('BASE_URL') ~ '/css/app.css' }}" rel="stylesheet">
 </head>
 <body>
 <div id="root">
@@ -15,10 +15,11 @@
             </div>
 
             <div style="margin-left: 15px;">
-                <select>
+                <select onchange="changeZone(this)">
                     {% if zones %}
                     {% for zone in zones %}
-                    <option value="{{ zone }}">{{ zone }}
+                    <option {{ activeZone == zone ? 'selected' : '' }} value="{{ zone }}"
+                    >{{ zone }}
                     <option>
                         {% endfor %}
                         {% endif %}
@@ -31,8 +32,34 @@
         {% block content %}
         {% endblock %}
     </div>
+
+    <div id="loader">
+        <div>
+            <span>Please wait while loading...</span>
+        </div>
+    </div>
 </div>
 
+<script type="text/javascript">
+  let loader = document.getElementById('loader');
+
+  function changeZone(select) {
+    window.location.href = '{{ basePage }}' + '/' + select.value;
+  }
+
+  function showLoader() {
+    loader.classList.remove('hidden');
+  }
+
+  function hideLoader() {
+    loader.classList.add('hidden');
+  }
+
+  // Hide loader when document on load.
+  document.addEventListener("DOMContentLoaded", function (event) {
+    hideLoader();
+  });
+</script>
 {% block script %}
 {% endblock %}
 </body>

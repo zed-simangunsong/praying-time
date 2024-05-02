@@ -3,7 +3,7 @@
 {% block content %}
     <div class="flex row prayer_info">
         {% for song in songs %}
-            <div class="flex-item card {{ 'audio-box-' ~ song.box_song_id }}">
+            <div class="flex-item card audio-card-box {{ 'audio-box-' ~ song.box_song_id }}">
                 <div>
                     <div class="card-title">
                         {{ song.prayer_name }}
@@ -16,10 +16,10 @@
                             Your browser does not support the audio element.
                         </audio>
 
-                        <button class="hidden button-audio-{{ song.box_song_id }}"
-                                onclick="playAudio()"
+                        <button class="hidden button-audio"
                                 data-target-audio="{{ 'audio-box-' ~ song.box_song_id }}"
-                                data-prayer-datetime="{{ song.prayer_date ~ ' ' ~song.prayer_time }}">X</button>
+                                data-prayer-datetime="{{ song.prayer_date ~ ' ' ~song.prayer_time }}">Play
+                        </button>
                     </div>
                 </div>
             </div>
@@ -29,57 +29,76 @@
 
 {% block script %}
     <script>
-      let now = null, audioButtons = null, prayerTime = null, targetAudio = null;
+      let now = null,
+        date = null,
+        audioButtons = null,
+        prayerTime = null,
+        targetCard = null,
+        targetAudio = null,
+        lastRefresh = '{{ last_refresh }}';
 
-      function playAudio() {
-        // targetAudio = audio.getAttribute('data-target-audio');
-        targetAudio = 'audio-box-51';
-        targetAudio = document.getElementById(targetAudio);
+      setInterval(function () {
+        // Today date (2 digit format)
+        date = new Date;
+        now = date.getFullYear()
+          + '-' + ('0' + (date.getMonth() + 1)).slice(-2)
+          + '-' + ('0' + date.getDate()).slice(-2);
 
-        targetAudio.muted = false;
-        targetAudio.play();
-      }
+        // It's new day, lets refresh our browser.
+        if (lastRefresh !== now) {
+          window.location.reload();
+        }
 
-      setTimeout(function(){
-        let btn = document.getElementsByClassName('button-audio-51');
-        console.log(btn[0]);
-        btn[0].click();
-      }, 3000);
+        // Append time to today date (2 digit format).
+        now = now
+          + ' ' + ('0' + date.getHours()).slice(-2)
+          + ':' + ('0' + date.getMinutes()).slice(-2)
+          + ':' + ('0' + date.getSeconds()).slice(-2);
 
-      // setInterval(function () {
-      //   // Today date.
-      //   now = new Date;
-      //   now = now.getFullYear()
-      //     + '-' + ('0' + (now.getMonth() + 1)).slice(-2)
-      //     + '-' + ('0' + now.getDate()).slice(-2)
-      //     + ' ' + ('0' + now.getHours()).slice(-2)
-      //     + ':' + ('0' + now.getMinutes()).slice(-2)
-      //     + ':' + ('0' + now.getSeconds()).slice(-2);
-      //
-      //   audioButtons = document.getElementsByClassName('button-audio');
-      //
-      //   for (let i = 0; i < audioButtons.length; i++) {
-      //     prayerTime = audioButtons[i].getAttribute('data-prayer-datetime');
-      //
-      //     if (5 === i) {
-      //       audioButtons[i].click();
-      //       break;
-      //     }
-      //
-      //     // if (prayerTime === now) {
-      //     //   targetAudio = audioButtons[i].getAttribute('data-target-audio');
-      //     //   targetAudio = document.getElementById(targetAudio);
-      //     //
-      //     //   if (audioButtons[i]) {
-      //     //     audioButtons[i].addEventListener('click', function () {
-      //     //       playAudio(targetAudio);
-      //     //       console.log('CLicked');
-      //     //     });
-      //     //
-      //     //     audioButtons[i].click();
-      //     //   }
-      //     // }
-      //   }
-      // }, 1000);
+        // Loop through available audio button.
+        audioButtons = document.getElementsByClassName('button-audio');
+        for (let i = 0; i < audioButtons.length; i++) {
+          prayerTime = audioButtons[i].getAttribute('data-prayer-datetime');
+
+          if (2 === i) {
+            console.log(prayerTime, 'vs', now);
+          }
+
+          // It is prayer time, find the correct audio.
+          if (prayerTime === now) {
+            // Get target audio card and it is audio element.
+            targetAudio = audioButtons[i].getAttribute('data-target-audio');
+            targetCard = document.getElementsByClassName(targetAudio);
+            targetAudio = document.getElementById(targetAudio);
+
+            // Remove "active" class from audio-card-box.
+            let cards = document.getElementsByClassName('audio-card-box');
+            for (let j = 0; j < cards.length; j++)
+              cards[j].classList.remove('active');
+
+            // Add class "active" to in progress audio-card-box prayer time.
+            targetCard[0].classList.add('active');
+
+            // Add click event listener to the audio button,
+            // and trigger the click.
+            audioButtons[i].addEventListener('click', function () {
+              // Play the audio.
+              targetAudio.muted = false;
+              targetAudio.play();
+            });
+
+            {% if 'true' == autoPlay %}
+                audioButtons[i].click();
+            {% else %}
+                // Show play button.
+                audioButtons[i].classList.remove('hidden');
+                // Hide play button after 10 minute.
+                setTimeout(function() {
+                  audioButtons[i].classList.add('hidden');
+                }, {{ hideButtonTimer }});
+            {% endif %}
+          }
+        }
+      }, 1000);
     </script>
 {% endblock %}

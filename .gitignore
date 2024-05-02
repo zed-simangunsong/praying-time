@@ -3,3 +3,4 @@
 .git
 cache
 vendor
+node_modules

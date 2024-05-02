@@ -9,7 +9,7 @@
 namespace Zed\Test\Lib;
 
 
-class Subscriber
+class User
 {
     protected $profile;
 

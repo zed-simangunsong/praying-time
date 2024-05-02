@@ -11,11 +11,11 @@ namespace Zed\Test\Lib;
 
 class Str
 {
-    public static function camelcase($string, $delimiter = [' ', '-', '_'])
+    public static function camelCase($string, $delimiter = [' ', '-', '_'])
     {
         $string = str_replace($delimiter, ' ', $string);
 
-        return lcfirst(self::camelize($string));
+        return lcfirst(self::pascalCase($string));
     }
 
     /**
@@ -23,18 +23,18 @@ class Str
      *
      * @param $string
      * @param string $delimiter
-     * @param bool $camelCase
+     * @param bool $keepDelimiter
      * @return mixed
      */
-    public static function camelize($string, $delimiter = ' ', $camelCase = true)
+    public static function pascalCase($string, $delimiter = ' ', $keepDelimiter = true)
     {
         if (is_bool($delimiter)) {
-            $camelCase = $delimiter;
+            $keepDelimiter = $delimiter;
             $delimiter = ' ';
         }
 
         $string = array_map('ucfirst', explode($delimiter, strtolower($string)));
 
-        return implode($camelCase ? '' : $delimiter, $string);
+        return implode($keepDelimiter ? '' : $delimiter, $string);
     }
 }

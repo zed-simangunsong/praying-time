@@ -1,0 +1,118 @@
+body {
+  font-size: 13px;
+}
+
+.hidden {
+  display: none;
+}
+
+select {
+  padding: 5px;
+}
+
+button {
+  border: 1px solid #cecece;
+  border-radius: 3px;
+  padding: 5px;
+  margin-top: 10px;
+}
+
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  opacity: 0.7;
+
+  > div {
+    position: relative;
+    width: 30%;
+    padding: 20px;
+    margin-left: -15%;
+    margin-top: -73px;
+    text-align: center;
+    left: 50%;
+    top: 50%;
+    background: url('../images/loader.gif') top center no-repeat;
+
+    > span {
+      display: inline-block;
+      margin-top: 90px;
+      font-weight: bolder;
+    }
+  }
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+
+  div#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    line-height: 30px;
+    padding: 5px 2%;
+    background-color: #cecece;
+  }
+
+  div#body {
+    width: 98%;
+    margin: 50px auto 0;
+    padding: 5px;
+  }
+}
+
+.flex {
+  display: flex;
+
+  &.row {
+    flex-direction: row;
+
+    &.prayer_info {
+
+      .card {
+        width: 15%;
+        border: 1px solid #eeeddd;
+        background-color: #eeeeee;
+        border-radius: 5px;
+        margin-left: 5px;
+        text-align: center;
+
+        &:first-child {
+          margin-left: 0;
+        }
+
+        .card-title {
+          border-bottom: 1px solid #fff6f6;
+          padding: 10px;
+          font-weight: bolder;
+        }
+
+        .card-body {
+          padding: 10px;
+          background-color: #f7f7f7;
+
+          button {
+            width: 100%;
+          }
+        }
+
+        &.active {
+          background-color: #878787;
+
+          .card-body {
+            padding: 10px;
+            background-color: #cbcbcb;
+          }
+
+        }
+
+      }
+
+    }
+  }
+}

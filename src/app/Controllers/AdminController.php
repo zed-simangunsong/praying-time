@@ -11,9 +11,17 @@ namespace Zed\Test\App\Controllers;
 
 use Zed\Test\App\Models\BoxModel;
 use Zed\Test\App\Models\ZoneModel;
+use Zed\Test\Lib\User;
 
-class IndexController
+class AdminController
 {
+    protected $admin;
+
+    public function __construct()
+    {
+        $this->admin = new User($_SESSION['subscriber'] ?? null);
+    }
+
     /**
      * @param null $activeZone
      * @return string
@@ -34,12 +42,17 @@ class IndexController
     {
         $zones = ZoneModel::getCodes();
 
+        // Default active zone.
         if (!$activeZone && isset($zones[0])) $activeZone = $zones[0];
+
+        // Get boxes by zone.
+        $boxes = $activeZone ? BoxModel::instance()->getByZonePrayerTimeOption($activeZone) : [];
 
         return view('index.twig', [
             'zones' => $zones,
             'activeZone' => $activeZone,
-            'boxes' => $activeZone ? BoxModel::instance()->getByZonePrayerTimeOption($activeZone) : [],
+            'boxes' => $boxes,
+            'basePage' => BASE_URL . '/admin.html/index',
         ]);
     }
 }
