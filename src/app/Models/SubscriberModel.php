@@ -13,13 +13,23 @@ class SubscriberModel extends BaseModel
 {
     protected $table = 'subscriber';
 
-    public function box($subscriber_id)
+    public function box($subscriber_id, $prayerTimeOption = 1)
     {
-        return $this
+        $builder = $this
             ->builder()
-            ->select('subscriber.subscriber_id', 'box.prayer_zone', 'box.box_id')
+            ->select('subscriber.subscriber_id', 'box.prayer_zone', 'box.box_id', 'box.box_name')
             ->joinUsing('subscriber_box', 'subscriber_id')
-            ->joinUsing('box', 'box_id')
-            ->findAll('subscriber.subscriber_id', $subscriber_id);
+            ->joinUsing('box', 'box_id');
+
+        is_array($subscriber_id)
+            ? $builder->whereIn('subscriber.subscriber_id', $subscriber_id)
+            : $builder->where('subscriber.subscriber_id', $subscriber_id);
+
+        if (!is_null($prayerTimeOption)) {
+            $builder->where('box.prayer_time_option', $prayerTimeOption);
+        }
+
+        return $builder->orderBy('box.prayer_zone')
+            ->get();
     }
 }

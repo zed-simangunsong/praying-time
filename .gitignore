@@ -1,6 +1,7 @@
 .env
 .idea
 .git
+vhost.conf
 cache
 vendor
 node_modules

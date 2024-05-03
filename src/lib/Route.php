@@ -9,6 +9,8 @@
 namespace Zed\Test\Lib;
 
 
+use PHPMailer\PHPMailer\PHPMailer;
+
 class Route
 {
     /**
@@ -45,27 +47,51 @@ class Route
         if (isset($queries['playground_segment']) && !empty($queries['playground_segment'])) {
             $this->segment = explode('/', trim($queries['playground_segment'], '/'));
 
-            $this->action = Str::camelCase(array_shift($this->segment)) . 'Action';
+            $this->action = Str::camelCase(array_shift($this->segment), ['-', '_', '.']) . 'Action';
         }
     }
 
     /**
-     * Execute the request,and return the response.
-     *
-     * @return mixed
+     * @return string
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     public function response()
     {
         if (!class_exists($this->controller)) {
-            dd($this->controller);
-            return $this->error('Page not found.', 404);
+            return self::error('Page not found.', 404);
         } else {
-            return (new $this->controller)->{$this->action}(...$this->segment);
+            $page = new $this->controller;
+
+            // Authorization.
+            if (method_exists($page, 'authorize')) {
+                if (true !== ($authorize = $page->authorize($this->action))) {
+                    return $authorize;
+                }
+            }
+
+            if (method_exists($page, $this->action)) {
+                return $page->{$this->action}(...$this->segment);
+            }
+
+            return self::error('Page not found.', 404);
         }
     }
 
-    protected function error($context = '', $header = '404')
+    /**
+     * @param string $context
+     * @param string $httpResponseCode
+     * @return string
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public static function error($context = '', $httpResponseCode = '404')
     {
-        return $header . ' ' . $context;
+        return view('general/error-page.twig', [
+            'context' => $context,
+            'httpCode' => $httpResponseCode,
+        ]);
     }
 }

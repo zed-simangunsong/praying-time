@@ -9,22 +9,9 @@
 <body>
 <div id="root">
     <div id="header">
-        <div class="flex row">
-            <div>
-                Select Zone
-            </div>
-
-            <div style="margin-left: 15px;">
-                <select onchange="changeZone(this)">
-                    {% if zones %}
-                    {% for zone in zones %}
-                    <option {{ activeZone == zone ? 'selected' : '' }} value="{{ zone }}"
-                    >{{ zone }}
-                    <option>
-                        {% endfor %}
-                        {% endif %}
-                </select>
-            </div>
+        <div>
+            {% block menu %}
+            {% endblock %}
         </div>
     </div>
 
@@ -33,7 +20,7 @@
         {% endblock %}
     </div>
 
-    <div id="loader">
+    <div class="popup" id="loader">
         <div>
             <span>Please wait while loading...</span>
         </div>
@@ -42,10 +29,6 @@
 
 <script type="text/javascript">
   let loader = document.getElementById('loader');
-
-  function changeZone(select) {
-    window.location.href = '{{ basePage }}' + '/' + select.value;
-  }
 
   function showLoader() {
     loader.classList.remove('hidden');

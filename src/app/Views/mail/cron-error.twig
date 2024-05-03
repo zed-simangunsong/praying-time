@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title ?? 'Cron error email notification!' }}</title>
+    <style>
+        #root {
+            width: 100%;
+            height: 100%;
+        }
+
+        #root #body {
+            width: 80%;
+            margin: 0 auto;
+            padding: 10px;
+            border: 2px solid #e7e7e7;
+            border-radius: 5px;
+            background: linear-gradient(45deg, #e8e8e8, transparent);
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        tr td {
+            padding-left: 10px;
+        }
+
+        tr td:first-child {
+            padding: 0;
+        }
+
+        thead tr {
+            border-top: 1px solid #dcdcdc;
+            border-bottom: 1px solid #dcdcdc;
+        }
+    </style>
+</head>
+<body>
+<div id="root">
+    <div id="body">
+        <p>Hello {{ recipient }},</p>
+        <p>On <strong>{{ cronDate }}</strong> you have failed cron task, with below information:</p>
+        <div>
+            <table>
+                <thead>
+                <tr>
+                    <td style="width:50px;">Box ID</td>
+                    <td style="width:100px;">Prayer Time Zone</td>
+                    <td style="width:200px;">Error Message</td>
+                    <td>API Response</td>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for data in cronData %}
+                    <tr>
+                        <td>{{ data.boxId }}</td>
+                        <td>{{ data.prayerZone }}</td>
+                        <td>{{ data.errorMessage }}</td>
+                        <td>{{ data.apiResponse }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

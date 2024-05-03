@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    <link href="{{ constant('BASE_URL') ~ '/css/app.css' }}" rel="stylesheet">
+</head>
+<body>
+<div id="root">
+    <div id="body">
+        <div class="error-page">
+            <h3>{{ httpResponseCode ?? '404' }}</h3>
+            <div>
+                {{ context ?? 'Page not found.' }}
+            </div>
+            <p>
+                Maybe going back to <strong><a href="{{ constant('BASE_URL') }}">homepage</a></strong>,
+                could help.
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

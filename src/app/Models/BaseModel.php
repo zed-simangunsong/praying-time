@@ -62,16 +62,32 @@ abstract class BaseModel
     /**
      * Reindex an array keyed by existing field.
      *
-     * @param $rows
+     * @param array $rows
      * @param $keyField
      * @return array
      */
-    public function keyBy($rows, $keyField)
+    public function keyBy(array $rows, $keyField)
     {
         $arr = [];
 
         foreach ($rows as $row) {
             $arr[$row->{$keyField}] = $row;
+        }
+
+        return $arr;
+    }
+
+    /**
+     * @param array $rows
+     * @param $key
+     * @return array
+     */
+    public function pluck(array $rows, $key)
+    {
+        $arr = [];
+
+        foreach ($rows as $row) {
+            $arr[] = $row->{$key};
         }
 
         return $arr;

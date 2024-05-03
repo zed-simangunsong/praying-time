@@ -1,0 +1,54 @@
+{% extends "admin/base.twig" %}
+
+{% block content %}
+    <table class="custom">
+        <caption>List of <strong>Song</strong></caption>
+        <thead>
+        <tr>
+            <th class="index">#</th>
+            <th>Song Title</th>
+            <th>Box - Prayer Zone</th>
+            <th>Prayer Datetime</th>
+            <th>Prayer Time Sequence</th>
+            <th>Audio File</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% if paginator.items | length > 0 %}
+            {% for index, song in paginator.items %}
+                <tr>
+                    <td>{{ paginator.start + index }}</td>
+                    <td>{{ song.song_title }}</td>
+                    <td>{{ boxes[song.box_id]|join(', ') }}</td>
+                    <td>{{ song.prayer_date ~ ' ' ~ song.prayer_time }}</td>
+                    <td>{{ song.prayer_time_seq }}</td>
+                    <td>{{ song.audio_file_path }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6">No data available.</td>
+            </tr>
+        {% endif %}
+        </tbody>
+
+        {% if paginator.items | length > 0 %}
+            <tfoot>
+            <tr>
+                <td colspan="6">
+                    <div class="flex row">
+                        <div class="pagination-info">
+                            Showing <strong>{{ paginator.start ~ ' - ' ~ paginator.end }}</strong> from
+                            <strong>{{ paginator.total }}</strong>
+                        </div>
+                        <div class="last-item pagination">
+                            {{ paginator.paging | raw }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tfoot>
+        {% endif %}
+    </table>
+{% endblock %}

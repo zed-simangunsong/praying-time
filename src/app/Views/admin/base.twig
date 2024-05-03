@@ -1,0 +1,25 @@
+{% extends "base.twig" %}
+
+{% block menu %}
+    <div class="flex row">
+        <div>
+            <ul class="flex row menu">
+                <li>
+                    <a href="{{ constant('BASE_URL') }}/admin.html">Subscriber</a>
+                </li>
+                <li>
+                    <a href="{{ constant('BASE_URL') }}/admin.html/box">Box</a>
+                </li>
+                <li>
+                    <a href="{{ constant('BASE_URL') }}/admin.html/box-song">Songs</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="last-item">
+            Hello <strong>{{ username ?? '' }}</strong> &nbsp; <a
+                    href="{{ constant('BASE_URL') ~ '/admin.html/logout' }}">Log Out</a>
+        </div>
+    </div>
+
+{% endblock %}

@@ -40,7 +40,7 @@ class SubscriberController
     }
 
     /**
-     * @param null $activeZone
+     * @param null $currentBox
      * @return string
      * @throws \Pecee\Pixie\Exception
      * @throws \Pecee\Pixie\Exceptions\ColumnNotFoundException
@@ -55,88 +55,58 @@ class SubscriberController
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function indexAction($activeZone = null)
+    public function indexAction($currentBox = null)
     {
         if (!$this->subscriber->id()) {
             // Show login form.
             return $this->loginAction();
         } else {
-            [$zones, $boxes] = $this->getSubscriberZones($activeZone);
+            $boxes = $this->getSubscriberBox($currentBox);
 
-            if ([] !== $zones || !isset($boxes[$activeZone])) {
+            if (isset($boxes[$currentBox])) {
                 // Get box song.
-                $songs = $this->boxSongModel->getSongByBoxAndDate($boxes[$activeZone]->box_id, date('Y-m-d'));
+                $songs = $this->boxSongModel->getSongByBoxAndDate($boxes[$currentBox]->box_id, date('Y-m-d'));
 
                 return view('subscriber/index.twig', [
-                    'zones' => $zones,
+                    'boxes' => $boxes,
                     'songs' => $songs,
                     'last_refresh' => $_SESSION['last_refresh'],
                     'autoPlay' => env('AUTO_PLAY', 'true'),
-                    'hideButtonTimer' => env('HIDE_BUTTON_AFTER', 120000),
+                    'hideButtonAfter' => env('HIDE_BIG_CARD_TIMER', 300000),
                     'basePage' => BASE_URL . '/subscriber.html/index',
-                    'activeZone' => $activeZone,
+                    'currentBox' => $currentBox,
+                    'username' => $this->subscriber->name(),
                 ]);
             } else {
-                // Show subscribe notification page.
+                return view('subscriber/no-subscription.twig', [
+                    'username' => $this->subscriber->name(),
+                ]);
             }
         }
     }
 
     /**
-     * Show/Process login.
+     * Show login form.
      *
+     * @param $username
+     * @param $error
      * @return string
-     * @throws \Pecee\Pixie\Exception
-     * @throws \Pecee\Pixie\Exceptions\ColumnNotFoundException
-     * @throws \Pecee\Pixie\Exceptions\ConnectionException
-     * @throws \Pecee\Pixie\Exceptions\DuplicateColumnException
-     * @throws \Pecee\Pixie\Exceptions\DuplicateEntryException
-     * @throws \Pecee\Pixie\Exceptions\DuplicateKeyException
-     * @throws \Pecee\Pixie\Exceptions\ForeignKeyException
-     * @throws \Pecee\Pixie\Exceptions\NotNullException
-     * @throws \Pecee\Pixie\Exceptions\TableNotFoundException
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function loginAction()
+    public function loginAction($username = '', $error = '')
     {
         if (isset($_SESSION['subscriber'])) {
             $this->redirectLoggedSubscriber();
         }
 
-        $error = null;
-        $subscriberName = '';
-
-        if ($_POST) {
-            $subscriberName = $_POST['subscriberName'];
-
-            if (!isset($_POST['token']) || $_POST['token'] !== $_SESSION['token']) {
-                $error = 'Invalid CSRF token.';
-            } else {
-                // Find subscriber with subscriber name.
-                $subscriber = SubscriberModel::instance()
-                    ->builder()
-                    ->find($_POST['subscriberName'], 'subscriber_name');
-
-                if (!($subscriber) | !password_verify($_POST['password'], $subscriber->password)) {
-                    $error = 'Subscriber not found. Please check again.';
-                } else {
-                    // Set login session.
-                    $_SESSION['subscriber'] = json_encode([
-                        'id' => $subscriber->subscriber_id,
-                        'subscriber_name' => $subscriber->subscriber_name
-                    ]);
-
-                    $this->redirectLoggedSubscriber();
-                }
-            }
-        }
-
-        return view('subscriber/login.twig', [
+        return view('general/login.twig', [
+            'formAction' => BASE_URL . '/subscriber.html/do-login',
+            'usernamePlaceholder' => 'Subscriber name',
             'token' => $_SESSION['token'],
-            'error' => $error,
-            'subscriber' => $subscriberName,
+            'username' => urldecode($username),
+            'error' => urldecode($error),
         ]);
     }
 
@@ -150,22 +120,95 @@ class SubscriberController
     }
 
     /**
-     * @param $activeZone
+     * Get subscriber boxes.
+     *
+     * @param $currentBox
      * @return array
      */
-    protected function getSubscriberZones(&$activeZone)
+    protected function getSubscriberBox(&$currentBox)
     {
         // Get subscriber boxes.
-        $zones = [];
         $boxes = $this->subscriberModel->box($this->subscriber->id());
-        $boxes = $this->subscriberModel->keyBy($boxes, 'prayer_zone');
+        $boxes = $this->subscriberModel->keyBy($boxes, 'box_id');
 
         foreach ($boxes as $box) {
-            if (!isset($activeZone)) $activeZone = $box->prayer_zone;
-
-            $zones[] = $box->prayer_zone;
+            if (!isset($currentBox)) $currentBox = $box->box_id;
         }
 
-        return [$zones, $boxes];
+        return $boxes;
+    }
+
+    /**
+     * Handle login process.
+     *
+     * @return string|void
+     * @throws \Pecee\Pixie\Exception
+     * @throws \Pecee\Pixie\Exceptions\ColumnNotFoundException
+     * @throws \Pecee\Pixie\Exceptions\ConnectionException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateColumnException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateEntryException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateKeyException
+     * @throws \Pecee\Pixie\Exceptions\ForeignKeyException
+     * @throws \Pecee\Pixie\Exceptions\NotNullException
+     * @throws \Pecee\Pixie\Exceptions\TableNotFoundException
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function doLoginAction()
+    {
+        $error = null;
+        $username = '';
+
+        if ($_POST) {
+            $username = $_POST['username'];
+
+            if (!isset($_POST['token']) || $_POST['token'] !== $_SESSION['token']) {
+                $error = 'Invalid CSRF token.';
+            } else {
+                // Find subscriber with subscriber name.
+                $subscriber = SubscriberModel::instance()
+                    ->builder()
+                    ->find($username, 'subscriber_name');
+
+                if (!($subscriber) || !password_verify($_POST['password'], $subscriber->password)) {
+                    $error = 'Subscriber not found. Please check again.';
+                } else {
+                    // Set login session.
+                    $_SESSION['subscriber'] = json_encode([
+                        'id' => $subscriber->subscriber_id,
+                        'name' => $subscriber->subscriber_name
+                    ]);
+
+                    $this->redirectLoggedSubscriber();
+
+                    return;
+                }
+            }
+        }
+
+        return $this->loginAction($username, $error);
+    }
+
+    /**
+     * @return string
+     * @throws \Pecee\Pixie\Exception
+     * @throws \Pecee\Pixie\Exceptions\ColumnNotFoundException
+     * @throws \Pecee\Pixie\Exceptions\ConnectionException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateColumnException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateEntryException
+     * @throws \Pecee\Pixie\Exceptions\DuplicateKeyException
+     * @throws \Pecee\Pixie\Exceptions\ForeignKeyException
+     * @throws \Pecee\Pixie\Exceptions\NotNullException
+     * @throws \Pecee\Pixie\Exceptions\TableNotFoundException
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function logoutAction()
+    {
+        $_SESSION['subscriber'] = null;
+
+        return $this->loginAction();
     }
 }

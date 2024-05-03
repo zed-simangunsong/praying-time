@@ -11,6 +11,8 @@ namespace Zed\Test\Lib;
 
 class User
 {
+    protected static $instance;
+
     protected $profile;
 
     public function __construct($json)
@@ -19,11 +21,23 @@ class User
             // Default empty profile.
             $json = json_encode([
                 'id' => null,
-                'subscriber_name' => null,
+                'name' => null,
             ]);
         }
 
         $this->profile = json_decode($json);
+    }
+
+    /**
+     * @param null $json
+     * @return static
+     */
+    public static function instance($json = null)
+    {
+        if (!isset(self::$instance))
+            self::$instance = new static($json);
+
+        return self::$instance;
     }
 
     public function id()
@@ -33,6 +47,6 @@ class User
 
     public function name()
     {
-        return $this->profile->subscriber_name;
+        return $this->profile->name;
     }
 }

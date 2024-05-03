@@ -11,11 +11,33 @@ namespace Zed\Test\Lib;
 
 class Api
 {
+    /**
+     * API URL.
+     *
+     * @var string
+     */
     protected $url;
 
+    /**
+     * Call method.
+     *
+     * @var string
+     */
     protected $method;
 
+    /**
+     * Parameter data need to be send to the API.
+     *
+     * @var array
+     */
     protected $data = [];
+
+    /**
+     * API response, normally be in JSON.
+     *
+     * @var string
+     */
+    protected $response;
 
     public function __construct($zone, $method = 'GET', array $data = [])
     {
@@ -26,18 +48,38 @@ class Api
         $this->data = $data;
     }
 
-
+    /**
+     * Execute the API call.
+     *
+     * @return $this
+     */
     public function getPrayerTimes()
     {
         try {
-            $response = json_decode(Request::curl($this->url, $this->method, $this->data), true);
+            $this->response = Request::curl($this->url, $this->method, $this->data);
         } catch (\Exception $e) {
-            $response = [
+            $this->response = json_encode([
                 'status' => 'KO',
-                'data' => $e->getMessage(),
-            ];
+                'errorMessage' => $e->getMessage(),
+            ]);
         }
 
-        return json_decode(json_encode($response));
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function toObject()
+    {
+        return json_decode($this->response);
     }
 }

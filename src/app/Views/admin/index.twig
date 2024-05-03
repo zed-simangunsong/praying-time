@@ -1,0 +1,50 @@
+{% extends "admin/base.twig" %}
+
+{% block content %}
+    <table class="custom">
+        <caption>List of <strong>Subscriber</strong></caption>
+        <thead>
+        <tr>
+            <th class="index">#</th>
+            <th>Subscriber Name</th>
+            <th>Subscription Box - Prayer Zone</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% if paginator.items | length > 0 %}
+            {% for index, subscriber in paginator.items %}
+                <tr>
+                    <td>{{ paginator.start + index }}</td>
+                    <td>{{ subscriber.subscriber_name }}</td>
+                    <td>
+                        {{ boxes[subscriber.subscriber_id]|join(', ') }}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="3">No data available.</td>
+            </tr>
+        {% endif %}
+        </tbody>
+
+        {% if paginator.items | length > 0 %}
+            <tfoot>
+            <tr>
+                <td colspan="3">
+                    <div class="flex row">
+                        <div class="pagination-info">
+                            Showing <strong>{{ paginator.start ~ ' - ' ~ paginator.end }}</strong> from
+                            <strong>{{ paginator.total }}</strong>
+                        </div>
+                        <div class="last-item pagination">
+                            {{ paginator.paging | raw }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tfoot>
+        {% endif %}
+    </table>
+{% endblock %}

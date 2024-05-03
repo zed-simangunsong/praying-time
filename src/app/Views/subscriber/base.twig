@@ -1,0 +1,33 @@
+{% extends "base.twig" %}
+
+{% block menu %}
+    <div class="flex row">
+        {% if boxes %}
+            <div>
+                Select Box:
+            </div>
+
+            <div style="margin-left: 15px;">
+                <select onchange="changeZone(this)">
+                    {% for box_id, box in boxes %}
+                        <option {{ currentBox == box_id ? 'selected' : '' }} value="{{ box_id }}"
+                        >{{ box.prayer_zone ~ ' - ' ~ box.box_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
+
+        <div class="last-item">
+            Hello <strong>{{ username ?? '' }}</strong> &nbsp; <a
+                    href="{{ constant('BASE_URL') ~ '/subscriber.html/logout' }}">Log Out</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+      function changeZone(select) {
+        window.location.href = '{{ basePage }}' + '/' + select.value;
+      }
+    </script>
+{% endblock %}

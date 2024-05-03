@@ -1,0 +1,50 @@
+{% extends "admin/base.twig" %}
+
+{% block content %}
+    <table class="custom">
+        <caption>List of <strong>Box</strong></caption>
+        <thead>
+        <tr>
+            <th class="index">#</th>
+            <th>Box Name</th>
+            <th>Prayer Zone</th>
+            <th>Prayer Time Option</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% if paginator.items | length > 0 %}
+            {% for index, box in paginator.items %}
+                <tr>
+                    <td>{{ paginator.start + index }}</td>
+                    <td>{{ box.box_name }}</td>
+                    <td>{{ box.prayer_zone }}</td>
+                    <td>{{ box.prayer_time_option }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4">No data available.</td>
+            </tr>
+        {% endif %}
+        </tbody>
+
+        {% if paginator.items | length > 0 %}
+            <tfoot>
+            <tr>
+                <td colspan="4">
+                    <div class="flex row">
+                        <div class="pagination-info">
+                            Showing <strong>{{ paginator.start ~ ' - ' ~ paginator.end }}</strong> from
+                            <strong>{{ paginator.total }}</strong>
+                        </div>
+                        <div class="last-item pagination">
+                            {{ paginator.paging | raw }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tfoot>
+        {% endif %}
+    </table>
+{% endblock %}

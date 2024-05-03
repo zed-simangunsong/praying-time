@@ -1,33 +1,49 @@
-{% extends "base.twig" %}
+{% extends "subscriber/base.twig" %}
+
 
 {% block content %}
     <div class="flex row prayer_info">
-        {% for song in songs %}
-            <div class="flex-item card audio-card-box {{ 'audio-box-' ~ song.box_song_id }}">
-                <div>
-                    <div class="card-title">
-                        {{ song.prayer_name }}
-                    </div>
-                    <div class="card-body">
-                        {{ song.prayer_time }}
+        {% if songs | length > 0 %}
+            {% for song in songs %}
+                <div class="flex-item card audio-card-box {{ 'audio-box-' ~ song.box_song_id }}">
+                    <div>
+                        <div class="card-title">
+                            {{ song.song_title }}
+                        </div>
+                        <div class="card-body">
+                            {{ song.prayer_time }}
 
-                        <audio muted autoplay="true" id="{{ 'audio-box-' ~ song.box_song_id }}">
-                            <source src="{{ song.audio_file_path }}" type="audio/mp3">
-                            Your browser does not support the audio element.
-                        </audio>
+                            <audio muted autoplay="true" id="{{ 'audio-box-' ~ song.box_song_id }}">
+                                <source src="{{ song.audio_file_path }}" type="audio/mp3">
+                                Your browser does not support the audio element.
+                            </audio>
 
-                        <button class="hidden button-audio"
-                                data-target-audio="{{ 'audio-box-' ~ song.box_song_id }}"
-                                data-prayer-datetime="{{ song.prayer_date ~ ' ' ~song.prayer_time }}">Play
-                        </button>
+                            <button class="hidden button-audio"
+                                    data-target-audio="{{ 'audio-box-' ~ song.box_song_id }}"
+                                    data-prayer-datetime="{{ song.prayer_date ~ ' ' ~song.prayer_time }}">Play
+                            </button>
+                        </div>
                     </div>
                 </div>
+            {% endfor %}
+        {% else %}
+            <div class="error-page">
+                Unfortunately, there is no generated song for this {{ activeZone }} area yet.
             </div>
-        {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="hidden big-box">
+        <div class="popup"></div>
+        <div class="content">
+            PRAYER TIME
+        </div>
     </div>
 {% endblock %}
 
 {% block script %}
+    {{ parent() }}
+
     <script>
       let now = null,
         date = null,
@@ -60,8 +76,8 @@
         for (let i = 0; i < audioButtons.length; i++) {
           prayerTime = audioButtons[i].getAttribute('data-prayer-datetime');
 
-          if (2 === i) {
-            console.log(prayerTime, 'vs', now);
+          if (0 === i) {
+            console.log(prayerTime, now);
           }
 
           // It is prayer time, find the correct audio.
@@ -79,6 +95,22 @@
             // Add class "active" to in progress audio-card-box prayer time.
             targetCard[0].classList.add('active');
 
+            // Show big box content.
+            let bigBox = document.querySelector('.big-box');
+            if (bigBox) {
+              bigBox.classList.remove('hidden');
+              bigBox.children[1].innerHTML = targetCard[0].children[0].children[0].innerHTML;
+            }
+
+            // Hide big box content and remove class "active" from audio card,
+            // after 5 minutes or configured timer.
+            setTimeout(function () {
+              targetCard[0].classList.remove('active');
+
+              bigBox.classList.add('hidden');
+            }, {{ hideButtonAfter }});
+
+
             // Add click event listener to the audio button,
             // and trigger the click.
             audioButtons[i].addEventListener('click', function () {
@@ -87,16 +119,16 @@
               targetAudio.play();
             });
 
-            {% if 'true' == autoPlay %}
-                audioButtons[i].click();
-            {% else %}
-                // Show play button.
-                audioButtons[i].classList.remove('hidden');
-                // Hide play button after 10 minute.
-                setTimeout(function() {
-                  audioButtons[i].classList.add('hidden');
-                }, {{ hideButtonTimer }});
-            {% endif %}
+              {% if 'true' == autoPlay %}
+            audioButtons[i].click();
+              {% else %}
+            // Show play button.
+            audioButtons[i].classList.remove('hidden');
+            // Hide play button after 10 minute.
+            setTimeout(function () {
+              audioButtons[i].classList.add('hidden');
+            }, {{ hideButtonAfter }});
+              {% endif %}
           }
         }
       }, 1000);

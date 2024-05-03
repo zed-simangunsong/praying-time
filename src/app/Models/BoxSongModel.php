@@ -67,7 +67,6 @@ class BoxSongModel extends BaseModel
                         'box_id' => $boxId,
                         'prayer_date' => date('Y-m-d', strtotime($item->date)),
                         'prayer_time' => $item->{$apiKey},
-                        'prayer_name' => $prayerName,
                         'song_title' => $this->generateSongTitle($prayerName, $item->date),
                         'prayer_time_seq' => $lastPrayerTimeSeq,
                         'audio_file_path' => $this->generateSongFileName($prayerName, $item->date, $zone),
@@ -94,8 +93,8 @@ class BoxSongModel extends BaseModel
 
     protected function generateSongFileName($prayerName, $date, $zone)
     {
-        if ('local' === strtolower(env('APP_ENV')))
-            return '/songs/demo.mp3';
+        if ('false' !== strtolower(env('CRON_SONG_DEFAULT_FILE_PATH')))
+            return env('CRON_SONG_DEFAULT_FILE_PATH');
 
         return '/songs/' . strtolower($prayerName) . '-' . date('m-d', strtotime($date)) . '-' . $zone . '.mp3';
     }

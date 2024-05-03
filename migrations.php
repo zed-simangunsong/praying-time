@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * This file will be used if you decide to use Doctrine Migrations,
+ * to manage the Database migration.
+ *
+ * See https://www.doctrine-project.org/projects/doctrine-migrations/en/3.7/reference/introduction.html
+ * for more detail.
+ */
+
 return [
     'table_storage' => [
         'table_name' => 'doctrine_migration_versions',
