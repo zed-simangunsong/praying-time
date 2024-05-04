@@ -102,12 +102,12 @@ in what time and we can rollback those changes in no time.
 │   │   ├── User.php                # Class to store basic information for log in user.  
 │   │   └── View.php                # Class to instantiate twig library.                
 │   ├── bootstrap.php               # File, in here we start the session, and declare some basic variable.               
-│   ├── function.php                # File, include some shortcut function to call instantiate an object.
+│   ├── function.php                # File, include some shortcut function.
 ├── .env.example                    # File, declare environment variable, e.g: DB auth, etc.  
-├── cli-config.php                  # File configuratin to support `doctrine/migrations`, see installation step below. 
+├── cli-config.php                  # File configuratin to support [`doctrine/migrations`](https://www.doctrine-project.org/projects/doctrine-migrations/en/3.7/index.html), see installation step below. 
 ├── composer.json         
 ├── composer.lock 
-├── migrations.php                  # File configuratin to support `doctrine/migrations`, see installation step below.          
+├── migrations.php                  # File configuration to support [`doctrine/migrations`](https://www.doctrine-project.org/projects/doctrine-migrations/en/3.7/index.html), see installation step below.          
 ├── package.json 
 ├── package-lock.json
 └── ...
@@ -122,12 +122,15 @@ policies. You need to allow your browser to play the audio.
 
 
 # Installation
+Please follow these setup, to install the application in your environment.  
+
 * Clone the repo & use master branch.
-* `Composer install`
-* `NPM install` (optional, do this if you wish to edit the _CSS_ using _SASS_).
 * Copy `.env.example` to `.env`, and update the basic configuration.  
 E.g:  _database connection, smtp_, etc.
 * From app root installation, run these CLI commands:  
+   * `Composer install`, in production no need to install dev package, to do that you
+   can use `Composer install --no-dev`
+   * `NPM install` (optional, do this if you wish to edit the _CSS_ using _SASS)
    * `vendor\bin\doctrine-migrations migrate`, you can omit this if you wish
    to use provided mysql script at "./migrations/raw-migration.sql"
    instead.

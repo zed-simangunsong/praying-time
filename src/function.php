@@ -5,20 +5,6 @@
  * @license     MIT License
  * @copyright   Copyright (2) 2024, zed-simangunsong
  */
-
-function dd(...$var)
-{
-    foreach ($var as $val) {
-        if (is_array($val)) {
-            echo '<pre>' . print_r($val, true) . '</pre>';
-        } else {
-            var_dump($val);
-        }
-        echo '<br/>';
-    }
-    die;
-}
-
 /**
  * --------------------------------------------------------------------------
  * Safely escape/encode the provided data.
