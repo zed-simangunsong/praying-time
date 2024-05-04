@@ -126,7 +126,8 @@ Please follow these setup, to install the application in your environment.
 
 * Clone the repo & use master branch.
 * Copy `.env.example` to `.env`, and update the basic configuration.  
-E.g:  _database connection, smtp_, etc.
+E.g:  _database connection_ (please note database need to be created manually), 
+_smtp_, etc.
 * From app root installation, run these CLI commands:  
    * `Composer install`, in production no need to install dev package, to do that you
    can use `Composer install --no-dev`
