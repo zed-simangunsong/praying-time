@@ -21,64 +21,62 @@ final class Version20240503045600 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE box (
-              box_id bigint(20) NOT NULL AUTO_INCREMENT,
-              box_name varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
-              prayer_zone char(5) COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
-              prayer_time_option tinyint(1) DEFAULT \'1\',
-              last_update datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              PRIMARY KEY (box_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci');
+        // Table box.
+        $box = $schema->createTable('box');
+        $box->addColumn('box_id', Types::INTEGER)->setAutoincrement(true)->setNotnull(true);
+        $box->addColumn('box_name', Types::STRING)->setLength(50)->setNotnull(true);
+        $box->addColumn('prayer_zone', Types::STRING)->setLength(5)->setNotnull(true);
+        $box->addColumn('prayer_time_option', Types::BOOLEAN)->setDefault(1)->setNotnull(true);
+        $box->addColumn('last_update', Types::DATETIME_MUTABLE)->setDefault('CURRENT_TIMESTAMP')->setNotnull(true);
+        $box->setPrimaryKey(['box_id']);
 
-        $this->addSql('CREATE TABLE subscriber (
-              subscriber_id bigint(20) NOT NULL AUTO_INCREMENT,
-              subscriber_name varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
-              password varchar(150) COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
-              last_update datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              PRIMARY KEY (subscriber_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci');
 
-        $this->addSql('CREATE TABLE subscriber_box (
-              subscriber_id bigint(20) NOT NULL,
-              box_id bigint(20) NOT NULL,
-              last_update datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              PRIMARY KEY (subscriber_id,box_id),
-              KEY subscriber_box_ibfk_1 (subscriber_id),
-              KEY subscriber_box_ibfk_2 (box_id),
-              CONSTRAINT subscriber_box_ibfk_1 FOREIGN KEY (subscriber_id) REFERENCES subscriber (subscriber_id),
-              CONSTRAINT subscriber_box_ibfk_2 FOREIGN KEY (box_id) REFERENCES box (box_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci');
+        // Table subscriber.
+        $subscriber = $schema->createTable('subscriber');
+        $subscriber->addColumn('subscriber_id', Types::INTEGER)->setAutoincrement(true)->setNotnull(true);
+        $subscriber->addColumn('subscriber_name', Types::STRING)->setLength(50)->setDefault(null);
+        $subscriber->addColumn('password', Types::STRING)->setLength(150)->setDefault(null);
+        $subscriber->addColumn('last_update', Types::DATETIME_MUTABLE)->setDefault('CURRENT_TIMESTAMP')->setNotnull(true);
+        $subscriber->setPrimaryKey(['subscriber_id']);
 
-        $this->addSql('CREATE TABLE box_song (
-              box_song_id bigint(20) NOT NULL AUTO_INCREMENT,
-              box_id bigint(20) NOT NULL,
-              song_title varchar(100) COLLATE utf8mb4_unicode_520_ci NOT NULL,
-              prayer_date date NOT NULL,
-              prayer_time time NOT NULL,
-              prayer_time_seq smallint(6) NOT NULL,
-              audio_file_path varchar(200) COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
-              last_update datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              PRIMARY KEY (box_song_id),
-              KEY box_song_ibfk_1 (box_id),
-              CONSTRAINT box_song_ibfk_1 FOREIGN KEY (box_id) REFERENCES box (box_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci');
 
-        $this->addSql('CREATE TABLE cron (
-              start_date date NOT NULL,
-              end_date date NOT NULL,
-              box_id bigint(20) NOT NULL,
-              prayer_zone char(5) COLLATE utf8mb4_unicode_520_ci NOT NULL,
-              last_update datetime DEFAULT NULL,
-              PRIMARY KEY (start_date,end_date,box_id,prayer_zone)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci');
+        // Table subscriber_box.
+        $subscriberBox = $schema->createTable('subscriber_box');
+        $subscriberBox->addColumn('subscriber_id', Types::INTEGER)->setNotnull(true);
+        $subscriberBox->addColumn('box_id', Types::INTEGER)->setNotnull(true);
+        $subscriberBox->addColumn('last_update', Types::DATETIME_MUTABLE)->setDefault('CURRENT_TIMESTAMP')->setNotnull(true);
+        $subscriberBox->setPrimaryKey(['subscriber_id', 'box_id']);
+
+
+        // Table box_song.
+        $boxSong = $schema->createTable('box_song');
+        $boxSong->addColumn('box_song_id', Types::INTEGER)->setAutoincrement(true)->setNotnull(true);
+        $boxSong->addColumn('box_id', Types::INTEGER)->setNotnull(true);
+        $boxSong->addColumn('song_title', Types::STRING)->setLength(100)->setNotnull(true);
+        $boxSong->addColumn('prayer_date', Types::DATE_MUTABLE)->setNotnull(true);
+        $boxSong->addColumn('prayer_time', Types::TIME_MUTABLE)->setNotnull(true);
+        $boxSong->addColumn('prayer_time_seq', Types::BIGINT)->setNotnull(true);
+        $boxSong->addColumn('audio_file_path', Types::STRING)->setLength(200)->setNotnull(true);
+        $boxSong->addColumn('last_update', Types::DATETIME_MUTABLE)->setDefault('CURRENT_TIMESTAMP')->setNotnull(true);
+        $boxSong->setPrimaryKey(['box_song_id']);
+
+
+        // Table cron.
+        $cron = $schema->createTable('cron');
+        $cron->addColumn('start_date', Types::DATE_MUTABLE)->setNotnull(true);
+        $cron->addColumn('end_date', Types::DATE_MUTABLE)->setNotnull(true);
+        $cron->addColumn('box_id', Types::INTEGER)->setNotnull(true);
+        $cron->addColumn('prayer_zone', Types::STRING)->setLength(5)->setNotnull(true);
+        $cron->addColumn('last_update', Types::DATETIME_MUTABLE)->setDefault('CURRENT_TIMESTAMP')->setNotnull(true);
+        $cron->setPrimaryKey(['start_date', 'end_date', 'box_id', 'prayer_zone']);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP TABLE box');
-        $this->addSql('DROP TABLE subscriber');
-        $this->addSql('DROP TABLE subscriber_box');
-        $this->addSql('DROP TABLE box_song');
-        $this->addSql('DROP TABLE cron');
+        $schema->dropTable('cron');
+        $schema->dropTable('subscriber_box');
+        $schema->dropTable('box_song');
+        $schema->dropTable('subscriber');
+        $schema->dropTable('box');
     }
 }

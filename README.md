@@ -9,6 +9,7 @@ time every day. Prayer time can be retrieved from API.
 
 # How this App work.
 ### Routing
+
 > [!NOTE]  
 > This App implement simple MVC pattern (see the directory structure 
 > below), which mean all request will be handled by specific 
@@ -60,10 +61,12 @@ Why template?
   * Without reinventing the wheel, template usually offer
   cache handler (for better performance), variable sanitation
   and many others feature.
-
-* [`doctrine/migrations`](https://github.com/doctrine/migrations), maintain DB migration history, 
-which allow us to know what changes in what time and we can 
-rollback those changes in no time.
+* [`phpmailer/phpmailer`](https://github.com/PHPMailer/PHPMailer),
+a well known libray for sending email over SMTP, and easy to use.
+Without a lot of effort, we can send our email even using HTML format.
+* [`doctrine/migrations`](https://github.com/doctrine/migrations), 
+maintain DB migration history, which allow us to know what changes 
+in what time and we can rollback those changes in no time.
 
 ### File structure
 
@@ -74,7 +77,8 @@ rollback those changes in no time.
 │   │   ├── color.txt               # Dummy for seeding the data  
 │   │   ├── script.php              # Script for seeding the data.  
 │   │   ├── word.txt                # Dummy for seeding the ddata            
-│   ├── cron.php                    # Script to generate song.  
+│   ├── cron.php                    # Script to generate song.            
+│   ├── raw-migration.sql           # MysQL script for manual migration.  
 │   └── Version20240503045600.php   # Migration file using CLI-command.  
 ├── public                  
 │   ├── css  
@@ -112,14 +116,14 @@ rollback those changes in no time.
 
 # Why my audio did not play automatically?
 Most of the browser change their auto play 
-policies. You need to allow the browser to play the audio.
+policies. You need to allow your browser to play the audio.
 - https://developer.chrome.com/blog/autoplay
 - https://webkit.org/blog/7734/auto-play-policy-changes-for-macos/
 
 
 # Installation
 * Clone the repo & use master branch.
-* `Composer install --no-dev ()`
+* `Composer install`
 * `NPM install` (optional, do this if you wish to edit the _CSS_ using _SASS_).
 * Copy `.env.example` to `.env`, and update the basic configuration.  
 E.g:  _database connection, smtp_, etc.
@@ -133,12 +137,17 @@ E.g:  _database connection, smtp_, etc.
    `0 0 * * SAT /usr/bin/php /var/www/app_root/migrations/cron.php`
    will executed every Saturday at 00:00 (assume your php.exe under _/usr/bin/php_).
 
+> [!CAUTION]  
+> On `.env` file please do not forget to update `BASE_URL` option,
+> so it will match your installation, otherwise the apps will not
+> working properly.
 
 # Suggestion for improvement.
 * Allow admin to manage all data (Subscriber, Box, Song) from admin 
 page. 
 * If the system growth and become more complex, it might be need to 
 use ORM instead a plain query builder for maintenance sake.
-* If one box can belong to 2 or more zone or need a master song table,
+* If one box can have 2 or more zone or need a master song table,
 then we need to change the DB structure a bit so we are consistent 
 using DB normalization.
+* Make a better login system.

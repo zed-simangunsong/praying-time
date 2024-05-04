@@ -37,6 +37,11 @@ $conn = DriverManager::getConnection([
     'host' => env('DB_HOST'),
     'driver' => env('DB_DRIVER_MIGRATION', 'pdo_mysql'),
     'memory' => true,
+    'charset' => env('DB_CHARSET', 'utf8mb4'),
+    'defaultTableOptions' => [
+        'charset' => env('DB_CHARSET', 'utf8mb4'),
+        'collate' => env('DB_COLLATION', 'utf8mb4'),
+    ]
 ]);
 
 return DependencyFactory::fromConnection($config, new ExistingConnection($conn));
