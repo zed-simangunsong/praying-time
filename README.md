@@ -1,21 +1,79 @@
-# Praying Time Generator
-Praying time based on area and subscriptions
+#About App
+System has many subscribers. Each subscriber has subscribed 
+to several music boxes. Each box can have many voicesover 
+(.mp3 files) and in specific prayer zone like WLY01, WLY02,… .  
 
-# How this is work.
+We will have a simplevoice over say that “Time to pray”. We 
+want to have an application to play this voiceover in prayer
+time every day. Prayer time can be retrieved from API.
+
+# How this App work.
 ### Routing
-All pages should be accessing using ".html" extension.
-For now there are two existing page: subscriber.html
-and admin.html
+> [!NOTE]  
+> This App implement simple MVC pattern (see the directory structure 
+> below), which mean all request will be handled by specific 
+> controller under `src/app/controller`.  
+>
+> Any pages should be accessing using `{page}.html` pattern in the 
+> URL, which represented by a controller. This mean every unique 
+> `{page}.html` will have a unique controller too.
 
-URL Pattern: some-page.html/(some-sub-page)/(...params)  
-To make this URL working, now you need to create the 
-new "SomePageController" controller class 
-(see directory structure), which have a method 
-"someSubPageAction", and accept params.
+
+> [!NOTE]  
+> Example:  
+> `some-page.html/(action-segment)/(...param-segments)`  
+> If we access URL like that, that's mean to make it working, we need
+> to create a controller file called `SomePageController.php`, to 
+> declare a class `SomePageController` (same with file name). And
+> this class should have a method called `actionSegmentAction`, which
+> accept all available params as parameter.  
+> Please note `action-segment` is optional, so if the segment did not
+> given in the URL, system will use `indexAction` as default action.  
+
+> [!TIP]  
+> Naming convention: `PascalCaseController` for controller, and
+> `camelCaseAction` for action.  
+> `Controller` and `Action` suffix is generated automatically, so
+> does need to include in the URL.
+
+For now there are two pages by default:  
+- **subscriber.html**, page for client which need to login
+using their subscribe name, by default password would be 
+`password` (you can change this in **migrations/seeder/script.php**)   
+
+- **admin.html**, page for admin to see the subscriber, box, and
+generated song list.  
+Credential: **admin / admin**
+
+
+
+# Libraries, and why?
+* [`vlucas/phpdotenv`](https://github.com/vlucas/phpdotenv), 
+easier way to separate configuration between each environment.
+* [`pecee/pixie`](https://github.com/skipperbent/pecee-pixie), 
+avoid using native query when not needed. It will be easier to 
+maintain the query using query builder. Also this query builder 
+did not have any other dependencies.
+* [`twig/twig`](https://github.com/twigphp/Twig), for templating.
+Why template? 
+  * It will allow us to maintain our code far easier, by 
+  separating logic layer from presentation layer.
+  * Without reinventing the wheel, template usually offer
+  cache handler (for better performance), XSSS
+
+* [`doctrine/migrations`](https://github.com/doctrine/migrations), maintain DB migration history, 
+which allow us to know what changes in what time and we can 
+rollback those changes in no time.
 
 ### Directory structure
 .  
-├── cache  
+├── migrations                 
+│   ├── seeder   
+│   │   ├── color.txt               # Use for seeding the ddata  
+│   │   ├── script.php              # Script for seeding the data.  
+│   │   ├── word.txt                # Use for seeding the ddata            
+│   ├── cron.php                    # Script to generate song.  
+│   └── Version20240503045600.php   # Migration file using CLI-command.  
 ├── public                  
 │   ├── css  
 │   │   ├── app.css  
@@ -26,10 +84,10 @@ new "SomePageController" controller class
 │   └── songs  
 ├── src                  
 │   ├── app  
-│   │   ├── Controllers             #Where you put your controllers. 
+│   │   ├── Controllers             #Where you put your controllers.  
 │   │   ├── Models                  #Where you put models for data layering.  
-│   │   └── Views                   #Where you put your twig files.                      
-│   └── lib    
+│   │   └── Views                   #Where you put your twig files.                     
+│   └── lib  
 │   │   ├── Api.php                 #Class to handle API call.  
 │   │   ├── DB.php                  #Class to manage DB connection.  
 │   │   ├── Request.php             #Class to make a new request using CURL.    
@@ -45,12 +103,33 @@ new "SomePageController" controller class
 
 # Why my audio did not play automatically?
 Most of the browser change their auto play 
-policies. You need to change some configuration.
+policies. You need to allow the browser to play the audio.
 - https://developer.chrome.com/blog/autoplay
 - https://webkit.org/blog/7734/auto-play-policy-changes-for-macos/
-# Suggestion
-- For weekly updates, it will be more clear if it's
-based on current system week, so first day of the week
-will be always Monday, and last date is Sunday.
 
--
+
+# Installation
+* Clone the repo & use master branch.
+* `Composer install --no-dev ()`
+* `NPM install` (optional, do this if you wish to edit the _CSS_ using _SASS_).
+* Copy `.env.example` to `.env`, and update the basic configuration.  
+E.g:  _database connection, smtp_, etc.
+* From app root installation, run these CLI commands:  
+   * `vendor\bin\doctrine-migrations migrate`, you can omit this if you wish
+   to use provided mysql script at "./migrations/raw-migration.sql"
+   instead.
+   * `php ./migrations/seeder/script.php` will generate dummy data.
+   * `php ./migrations/cron.php` will generate song. You can setup your
+   cron to make this executed periodically. For instance 
+   `0 0 * * SAT /usr/bin/php /var/www/app_root/migrations/cron.php`
+   will executed every Saturday at 00:00 (assume your php.exe under _/usr/bin/php_).
+
+
+# Suggestion for improvement.
+* Allow admin to manage all data (Subscriber, Box, Song) from admin 
+page. 
+* If the system growth and become more complex, it might be need to 
+use ORM instead a plain query builder for maintenance sake.
+* If one box can belong to 2 or more zone or need a master song table,
+then we need to change the DB structure a bit so we are consistent 
+using DB normalization.

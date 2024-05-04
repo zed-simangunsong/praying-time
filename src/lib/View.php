@@ -50,8 +50,6 @@ class View
      */
     public function render($view, array $context = [])
     {
-        return $this->renderer->render($view, $context + [
-            'user'
-            ]);
+        return $this->renderer->render($view, $context);
     }
 }

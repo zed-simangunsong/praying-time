@@ -1,12 +1,27 @@
 <?php
 /*
 |--------------------------------------------------------------------------
-| Bootstrap the application.
+| System directory.
+|--------------------------------------------------------------------------
+|
+*/
+define('VIEW_PATH', __DIR__ . '/../src/app/Views/');
+
+/*
+|--------------------------------------------------------------------------
+| Load composer autoload.
 |--------------------------------------------------------------------------
 */
-require '../src/bootstrap.php';
+include __DIR__ . '/../vendor/autoload.php';
 
-use Pecee\Pixie\QueryBuilder\Transaction;
+/*
+|--------------------------------------------------------------------------
+| Load environment configurations.
+|--------------------------------------------------------------------------
+*/
+$env = Dotenv\Dotenv::createImmutable(__DIR__ . DIRECTORY_SEPARATOR . '..');
+$env->load();
+
 use Zed\Test\App\Models\BoxModel;
 use Zed\Test\App\Models\BoxSongModel;
 use Zed\Test\App\Models\CronModel;
@@ -25,6 +40,9 @@ $taskError = [];    // Failed box item.
 $taskCounter = 0;   // Success batch insert BoxSongModel counter.
 
 foreach (ZoneModel::getCodes() as $zone) {
+    echo "Generating song for zone: $zone\n"; // Cli message.
+    echo "-----------------------------------------------\n";
+
     // Get boxes which have prayer time option on within zone.
     $zoneBoxes = $boxModel->getByZonePrayerTimeOption($zone, 1, 'box_id', 'box_name');
 
@@ -46,11 +64,17 @@ foreach (ZoneModel::getCodes() as $zone) {
         $objResponse = $apiRequest->toObject();
 
         foreach ($boxes as $box) {
+            echo "Generating song for box : " . $box->box_name; // Cli message.
+
             $error = '';
             if ($objResponse && 'OK!' === $objResponse->status && isset($objResponse->prayerTime)) {
-                if ([] !== $boxSongModel->insertBatchApi($today, $objResponse->prayerTime, $box->box_id, $zone, $endDate)) {
+                if ([] !== ($ids = $boxSongModel->insertBatchApi(
+                        $today, $objResponse->prayerTime, $box->box_id, $zone, $endDate))) {
+
                     // Task increment.
                     $taskCounter++;
+
+                    echo ' (' . count($ids) . " song generated)"; // Cli message.
 
                     // Batch inserted, now log to the cron table.
                     $cronModel->builder()->insert([
@@ -61,6 +85,8 @@ foreach (ZoneModel::getCodes() as $zone) {
                         'last_update' => $today,
                     ]);
                 } else {
+                    echo ". \nError when trying insert data to box_song table."; // Cli message.
+
                     $error = 'Error when trying insert data to box_song table';
                 }
             } else {
@@ -69,7 +95,10 @@ foreach (ZoneModel::getCodes() as $zone) {
                 } else {
                     $error = $objResponse->errorMessage;
                 }
+                echo ". \n$error"; // Cli message.
             }
+
+            echo "\n"; //Cli message.
 
             // Error, collect the data.
             if ('' !== $error) {
@@ -81,7 +110,11 @@ foreach (ZoneModel::getCodes() as $zone) {
                 ];
             }
         }
+    } else {
+        echo "All zone boxes already generated, or \nit might not have any available boxes.\n"; // Cli message.
     }
+
+    echo "\n-----------------------------------------------\n";
 }
 
 // We have error, send the notification email.

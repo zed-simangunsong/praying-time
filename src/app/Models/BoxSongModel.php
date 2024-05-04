@@ -93,7 +93,7 @@ class BoxSongModel extends BaseModel
 
     protected function generateSongFileName($prayerName, $date, $zone)
     {
-        if ('false' !== strtolower(env('CRON_SONG_DEFAULT_FILE_PATH')))
+        if ('false' !== strtolower(env('CRON_SONG_DEFAULT_FILE_PATH', 'false')))
             return env('CRON_SONG_DEFAULT_FILE_PATH');
 
         return '/songs/' . strtolower($prayerName) . '-' . date('m-d', strtotime($date)) . '-' . $zone . '.mp3';
