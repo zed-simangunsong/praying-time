@@ -1,4 +1,4 @@
-#About App
+# About App  
 System has many subscribers. Each subscriber has subscribed 
 to several music boxes. Each box can have many voicesover 
 (.mp3 files) and in specific prayer zone like WLY01, WLY02,… .  
@@ -20,13 +20,12 @@ time every day. Prayer time can be retrieved from API.
 
 
 > [!NOTE]  
-> Example:  
-> `some-page.html/(action-segment)/(...param-segments)`  
+> Example: `some-page.html/(action-segment)/(...param-segments)`  
 > If we access URL like that, that's mean to make it working, we need
 > to create a controller file called `SomePageController.php`, to 
 > declare a class `SomePageController` (same with file name). And
 > this class should have a method called `actionSegmentAction`, which
-> accept all available params as parameter.  
+> accept as many as available `param-segments` as parameter.  
 > Please note `action-segment` is optional, so if the segment did not
 > given in the URL, system will use `indexAction` as default action.  
 
@@ -59,19 +58,22 @@ Why template?
   * It will allow us to maintain our code far easier, by 
   separating logic layer from presentation layer.
   * Without reinventing the wheel, template usually offer
-  cache handler (for better performance), XSSS
+  cache handler (for better performance), variable sanitation
+  and many others feature.
 
 * [`doctrine/migrations`](https://github.com/doctrine/migrations), maintain DB migration history, 
 which allow us to know what changes in what time and we can 
 rollback those changes in no time.
 
-### Directory structure
+### File structure
+
+```
 .  
 ├── migrations                 
 │   ├── seeder   
-│   │   ├── color.txt               # Use for seeding the ddata  
+│   │   ├── color.txt               # Dummy for seeding the data  
 │   │   ├── script.php              # Script for seeding the data.  
-│   │   ├── word.txt                # Use for seeding the ddata            
+│   │   ├── word.txt                # Dummy for seeding the ddata            
 │   ├── cron.php                    # Script to generate song.  
 │   └── Version20240503045600.php   # Migration file using CLI-command.  
 ├── public                  
@@ -84,22 +86,29 @@ rollback those changes in no time.
 │   └── songs  
 ├── src                  
 │   ├── app  
-│   │   ├── Controllers             #Where you put your controllers.  
-│   │   ├── Models                  #Where you put models for data layering.  
-│   │   └── Views                   #Where you put your twig files.                     
+│   │   ├── Controllers             # Where you put your controllers.  
+│   │   ├── Models                  # Where you put models for data layering.  
+│   │   └── Views                   # Where you put your twig files.                     
 │   └── lib  
-│   │   ├── Api.php                 #Class to handle API call.  
-│   │   ├── DB.php                  #Class to manage DB connection.  
-│   │   ├── Request.php             #Class to make a new request using CURL.    
-│   │   ├── Route.php               #Class to handle routing based on given URI.    
-│   │   ├── Str.php                 #Class to handle string manipulation.  
-│   │   ├── User.php                #Class to store basic information for log in user.  
-│   │   └── View.php                #Class to instantiate twig library.                
-│   ├── bootstrap.php               #File, in here we start the session, and declare some basic variable.               
-│   ├── function.php                #File, include some shortcut function to call instantiate an object.
-├── .env                            #File, declare environment variable, e.g: DB auth, etc.  
+│   │   ├── Api.php                 # Class to handle API call.  
+│   │   ├── DB.php                  # Class to manage DB connection.  
+│   │   ├── Request.php             # Class to make a new request using CURL.    
+│   │   ├── Route.php               # Class to handle routing based on given URI.    
+│   │   ├── Str.php                 # Class to handle string manipulation.  
+│   │   ├── User.php                # Class to store basic information for log in user.  
+│   │   └── View.php                # Class to instantiate twig library.                
+│   ├── bootstrap.php               # File, in here we start the session, and declare some basic variable.               
+│   ├── function.php                # File, include some shortcut function to call instantiate an object.
+├── .env.example                    # File, declare environment variable, e.g: DB auth, etc.  
+├── cli-config.php                  # File configuratin to support `doctrine/migrations`, see installation step below. 
+├── composer.json         
+├── composer.lock 
+├── migrations.php                  # File configuratin to support `doctrine/migrations`, see installation step below.          
+├── package.json 
+├── package-lock.json
 └── ...
 
+```
 
 # Why my audio did not play automatically?
 Most of the browser change their auto play 
