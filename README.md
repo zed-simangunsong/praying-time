@@ -145,6 +145,7 @@ _smtp_, etc.
 > On `.env` file please do not forget to update `BASE_URL` option,
 > so it will match your installation, otherwise the apps will not
 > working properly.
+> It should be pointing to "public" directory.
 
 # Suggestion for improvement.
 * Allow admin to manage all data (Subscriber, Box, Song) from admin 
